@@ -1,6 +1,8 @@
 from tornado import websocket, web, ioloop
 import json, threading
 
+from recorder import Recorder
+
 clients = []
 
 class IndexHandler(web.RequestHandler):
@@ -27,10 +29,15 @@ app = web.Application([
 
 if __name__ == '__main__':
     app.listen(8888)
-
     t = threading.Thread(target=ioloop.IOLoop.instance().start)
     t.start()
 
-def sendValue(value):
-    for client in clients:
-        client.write_message(u''+value.__str__())
+    def sendValue():
+        recorder = Recorder()
+        data = recorder.read()
+        vol = recorder.rms(data)* 5000
+        for client in clients:
+            client.write_message(vol.__str__())
+            #client.write_message(value.__str__())
+    while 1:
+        sendValue()
