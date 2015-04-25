@@ -13,21 +13,8 @@ function init() {
     // Coordinates for letters
     var cubesCoords = [
         // H
-        [-180, 5, 0], [-180, 15, 0], [-180, 25, 0], [-180, 35, 0], [-180, 45, 0], [-170, 25, 0], [-160, 5, 0], [-160, 15, 0], [-160, 25, 0], [-160, 35, 0], [-160, 45, 0],
-        // a
-        [-140, 5, 0], [-140, 15, 0], [-140, 35, 0], [-130, 15, 0], [-130, 35, 0], [-120, 5, 0], [-120, 15, 0], [-120, 25, 0], [-120, 35, 0],
-        // c
-        [-100, 5, 0], [-100, 15, 0], [-100, 25, 0], [-100, 35, 0], [-90, 5, 0], [-90, 35, 0], [-80, 5, 0], [-80, 25, 0], [-80, 35, 0],
-        // k
-        [-60, 5, 0], [-60, 15, 0], [-60, 25, 0], [-60, 35, 0], [-60, 45, 0], [-50, 15, 0], [-50, 25, 0], [-40, 5, 0], [-40, 35, 0],
-
-        // F
-        [-20, 5, 0], [-20, 15, 0], [-20, 25, 0], [-20, 35, 0], [-20, 45, 0], [-10, 25, 0], [-10, 45, 0], [0, 25, 0], [0, 45, 0],
-        // M
-        [20, 5, 0], [20, 15, 0], [20, 25, 0], [20, 35, 0], [20, 45, 0], [30, 45, 0], [40, 5, 0], [40, 15, 0], [40, 25, 0], [40, 35, 0], [40, 45, 0], [50, 45, 0], [60, 5, 0], [60, 15, 0], [60, 25, 0], [60, 35, 0], [60, 45, 0],
-        // I
-        [80, 5, 0], [80, 45, 0], [90, 5, 0], [90, 15, 0], [90, 25, 0], [90, 35, 0], [90, 45, 0], [100, 5, 0], [100, 45, 0]
-    ];
+        [-180, 5, 0], [-180, 15, 0], [-180, 25, 0], [-180, 35, 0], [-180, 45, 0]
+        ];
 
     init();
     animateCamera();
@@ -143,36 +130,41 @@ function init() {
         var l = scene.children.length;
         //remove everything
         while (l--) {
-            console.log(scene.children[l]);
-            if(scene.children[l].type === 'Mesh') {
-                scene.remove(scene.children[l]);
+            if(Object.keys(scene.children[l]).indexOf('geometry') > -1) {
+                console.log(scene.children[l].geometry);
+                if(scene.children[l].geometry.type === 'BoxGeometry'){
+                    scene.remove(scene.children[l]);
+                }
             }
         }
 
-        cubesCoords.forEach(function (coords) {
-            // create a cube
-            var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
-            var cubeMaterial;
+        var columnHight = soundVolume, cubes;
+        var columnColor = chance.color();
+        
+        for(cubes = 0; cubes <= columnHight; cubes +=1){
+            var coords = {
+                x: 0,
+                z: 0
+            };
 
-            if (coords[0] > -30) {
-                cubeMaterial = new THREE.MeshLambertMaterial({color: 0xCC9900});
-            } else {
-                cubeMaterial = new THREE.MeshLambertMaterial({color: 0xEEEEEE});
-            }
+            coords.y = (coords.y || 0) + cubes * 10;
+
+            var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+            var cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
 
             var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
             cube.castShadow = true;
 
             // position the cubes
-            cube.position.x = coords[0] + 0;
-            cube.position.y = coords[1] + 0;
-            cube.position.z = coords[2] + Math.round(soundVolume) * 10;
+            cube.position.x = coords.x;
+            cube.position.y = coords.y;
+            cube.position.z = coords.z;
 
             // add the cubes to the scene
             scene.add(cube);
-        });
 
-        //requestAnimationFrame(animateMusic);
+        }
+
         render();
     }
 
