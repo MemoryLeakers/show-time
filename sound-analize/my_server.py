@@ -1,5 +1,7 @@
 from tornado import websocket, web, ioloop
 import json, threading
+import os
+import tornado
 
 from recorder import Recorder
 
@@ -21,10 +23,15 @@ class SocketHandler(websocket.WebSocketHandler):
         if self in clients:
             clients.remove(self)
 
-
+PATH = os.path.dirname(os.path.realpath(__file__))
+css_path = os.path.join(PATH, 'css')
+js_path = os.path.join(PATH, 'js')
+print(css_path)
 app = web.Application([
     (r'/', IndexHandler),
     (r'/ws', SocketHandler),
+    (r'/css/(.*)', tornado.web.StaticFileHandler, {'path': css_path}),
+    (r'/js/(.*)', tornado.web.StaticFileHandler, {'path': js_path}),
 ])
 
 if __name__ == '__main__':
@@ -35,7 +42,7 @@ if __name__ == '__main__':
     def sendValue():
         recorder = Recorder()
         data = recorder.read()
-        vol = recorder.rms(data)* 5000
+        vol = recorder.rms(data)* 50
         for client in clients:
             client.write_message(vol.__str__())
             #client.write_message(value.__str__())
