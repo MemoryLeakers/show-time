@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>tornado WebSocket example</title>
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+</head>
+<body>
+  <input type='range' id='slider'></input>
+  <script>
+    var ws = new WebSocket('ws://localhost:8888/ws');
+
+    ws.onopen = function(){
+        console.log('opened')
+    };
+    ws.onmessage = function(ev){
+      console.log('value set to: ', ev.data)
+      slider.value = ev.data
+    };
+    ws.onclose = function(ev){
+      console.log('closed')
+    };
+    ws.onerror = function(ev){
+      console.log('error: ', ev)
+    };
+  </script>
+</body>
+</html>
