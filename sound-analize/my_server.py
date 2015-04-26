@@ -64,7 +64,10 @@ if __name__ == '__main__':
         bam = rec.prepare_fft(data, CHUNK)
         note = rec.prepare_note(bam)
 
-        result_dict = {"volume": vol, "frequency": bam, "note": note}
+
+
+
+        result_dict = {"volume": vol, "frequency": bam, "note": note, "signal": rec.prepare_signal(data)}
         for client in clients:
             # client.write_message(vol.__str__())
             # client.write_message(bam.__str__())

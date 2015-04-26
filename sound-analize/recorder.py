@@ -41,6 +41,9 @@ class Recorder():
         bam = np.fft.fft(data)
         return [math.sqrt(x.real * x.real + x.imag * x.imag) / N for x in bam]
 
+    def prepare_signal(self, data):
+        return [x.__str__() for x in data]
+
     def prepare_note(self, data):
         '''
         Dark magic formulae for finding note from the frequency
