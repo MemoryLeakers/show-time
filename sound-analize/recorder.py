@@ -38,6 +38,11 @@ class Recorder():
         squares = sum([n * n for n in data])
         return math.sqrt(squares / data.__len__())
 
+    def prepare_fft(self, data, N):
+        bam = np.fft.fft(data)
+        return [math.sqrt(x.real * x.real + x.imag * x.imag) / N for x in bam]
+
+
     def fft(self, data=None, trimBy=10, logScale=False, divBy=100):
         if data is None:
             data = self.audio.flatten()
