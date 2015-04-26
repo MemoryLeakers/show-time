@@ -1,4 +1,4 @@
-function init() {
+function theme() {
     'use strict';
 
     var container, stats, plane, scene;
@@ -28,6 +28,12 @@ function init() {
         // I
         [80, 5, 0], [80, 45, 0], [90, 5, 0], [90, 15, 0], [90, 25, 0], [90, 35, 0], [90, 45, 0], [100, 5, 0], [100, 45, 0]
     ];
+
+    // sort by y in order to make more proportional visualizations
+    //cubesCoords.sort(function (a, b) {
+    //    return a[1] - b[1];
+    //});
+
 
     init();
     animateCamera();
@@ -111,6 +117,7 @@ function init() {
         ws.onopen = function(){
             console.log('opened');
         };
+
         ws.onmessage = function(ev){
             soundVolume = JSON.parse(ev.data).volume;
             frequency = JSON.parse(ev.data).frequency;
@@ -118,9 +125,11 @@ function init() {
             console.log('socket data:', ev.data);
             animateMusic(soundVolume, frequency);
         };
+
         ws.onclose = function(ev){
             console.log('closed');
         };
+
         ws.onerror = function(ev){
             console.log('error: ', ev);
         };
@@ -185,4 +194,4 @@ function init() {
     }
 }
 
-window.onload = init;
+window.onload = theme;
