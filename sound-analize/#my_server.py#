@@ -6,12 +6,9 @@ import tornado
 import numpy as np
 import socket
 
-
 from recorder import Recorder, CHUNK
 
 clients = []
-
-
 
 def get_ip():
     try:

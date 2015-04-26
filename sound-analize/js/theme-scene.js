@@ -2,8 +2,8 @@ function theme() {
     'use strict';
 
     var container, stats, plane, scene;
-    var camera, cameraControls, controls, renderer;
-    var cross, yellowLight, greyLight, object, loader;
+    var camera, cameraControls, renderer;
+    var cross, object, loader, sceneName = 'equalizer';
 
     var clock = new THREE.Clock();
     var chance = new Chance(new Date());
@@ -34,12 +34,11 @@ function theme() {
     //    return a[1] - b[1];
     //});
 
-
     init();
     animateCamera();
 
     function init() {
-        camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000);
+        camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1, 1000);
 
         // Set initial positions
         camera.position.x = 10;
@@ -112,6 +111,14 @@ function theme() {
 
         window.addEventListener('resize', onWindowResize, false);
 
+        window.addEventListener('keydown', toggleScenes, false);
+
+        connectionManager();
+
+        render();
+    }
+
+    function connectionManager() {
         var ws = new WebSocket('ws://localhost:8888/ws');
 
         ws.onopen = function(){
@@ -123,7 +130,7 @@ function theme() {
             frequency = JSON.parse(ev.data).frequency;
 
             console.log('socket data:', ev.data);
-            animateMusic(soundVolume, frequency);
+            animateMusic(soundVolume, frequency, sceneName);
         };
 
         ws.onclose = function(ev){
@@ -133,8 +140,6 @@ function theme() {
         ws.onerror = function(ev){
             console.log('error: ', ev);
         };
-
-        render();
     }
 
     function onWindowResize() {
@@ -145,12 +150,24 @@ function theme() {
         render();
     }
 
+    function toggleScenes(event){
+        var key = event.keyCode;
+
+        console.log(key);
+        if (key === 32) {
+            sceneName = 'hack';
+        } else {
+            sceneName = 'equalizer';
+        }
+        render();
+    }
+
     function animateCamera() {
         requestAnimationFrame(animateCamera);
         cameraControls.update();
     }
 
-    function animateMusic(soundVolume, frequency){
+    function cleanBoxes(){
         var l = scene.children.length;
         //remove everything
         while (l--) {
@@ -160,7 +177,17 @@ function theme() {
                 }
             }
         }
+    }
 
+    function animateMusic(soundVolume, frequency, sceneName){
+        cleanBoxes();
+
+        //requestAnimationFrame(animateMusic);
+        render();
+    }
+
+    function renderHackFMI(soundVolume, frequency){
+        // redraw letter cubes
         cubesCoords.forEach(function (coords, i) {
             // create a cube
             var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
@@ -176,19 +203,179 @@ function theme() {
             cube.castShadow = true;
 
             // position the cubes
-            cube.position.x = coords[0] + frequency[i] * 100;
+            cube.position.x = coords[0] + frequency[i] * 100 + soundVolume;
             cube.position.y = coords[1] + frequency[i] * 100;
-            cube.position.z = coords[2] + Math.round(soundVolume) * 2;
+            cube.position.z = coords[2] + Math.round(soundVolume) * 3;
 
             // add the cubes to the scene
             scene.add(cube);
         });
+    }
 
-        //requestAnimationFrame(animateMusic);
-        render();
+    function renderEqualizer(soundVolume, frequency){
+        var columnHeight = soundVolume / 5;
+        var columnColor = chance.color();
+
+        var coords  = {x: 0, z: 0, y: 0};
+
+        var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+        var cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+        var cube, cubes, cols, hue;
+
+        for(cols = 0; cols <= columnHeight; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+            console.log(columnColor);
+
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.y = (cubes * 10);
+                coords.x = (cols * 10);
+
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
+
+                // position the cubes
+                cube.position.x = coords.x;
+                cube.position.y = coords.y - coords.x;
+                cube.position.z = coords.z;
+
+                // add the cubes to the scene
+                scene.add(cube);
+            }
+        }
+
+        for(cols = 0; cols <= 10; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.y = (cubes * 10);
+                coords.x = (cols * -10);
+
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
+
+                // position the cubes
+                cube.position.x = coords.x;
+                cube.position.y = coords.y + coords.x;
+                cube.position.z = coords.z;
+
+                // add the cubes to the scene
+                scene.add(cube);
+            }
+        }
+
+        for(cols = 0; cols <= 10; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.z = (cubes * -10);
+                coords.y = (cubes * 10);
+
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
+
+                // position the cubes
+                cube.position.x = 0;
+                cube.position.y = coords.y;
+                cube.position.z = coords.z + coords.y;
+
+                // add the cubes to the scene
+                scene.add(cube);
+            }
+        }
+
+        for(cols = 0; cols <= 10; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.x = 0;
+                coords.y = (cubes * 10);
+                coords.z = (cols * -10);
+
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
+
+                // position the cubes
+                cube.position.x = coords.x;
+                cube.position.y = coords.y + coords.z;
+                cube.position.z = coords.z;
+
+                // add the cubes to the scene
+                scene.add(cube);
+            }
+        }
+
+        for(cols = 0; cols <= 10; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.x = 0;
+                coords.y = (cubes * 10);
+                coords.z = (cols * 10);
+
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
+
+                // position the cubes
+                cube.position.x = coords.x;
+                cube.position.y = coords.y - coords.z;
+                cube.position.z = coords.z;
+
+                // add the cubes to the scene
+                scene.add(cube);
+            }
+        }
     }
 
     function render() {
+
+        if(sceneName === 'hack'){
+            renderHackFMI(soundVolume, frequency);
+        } else if (sceneName === 'equalizer' ){
+            renderEqualizer(soundVolume, frequency);
+        }
+
         renderer.render(scene, camera);
         stats.update();
     }
