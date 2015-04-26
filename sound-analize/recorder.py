@@ -1,6 +1,5 @@
-
 import pyaudio
-import wave
+# import wave
 import math
 import numpy as np
 
@@ -32,26 +31,51 @@ class Recorder():
         print("* done")
 
         return np.fromstring(data, 'Float32')
+        # np.exp(2j * np.pi * np.arange(8) / 8)
+        # return np.fft.fft(data)
 
     def rms(self, data):
-        squares = sum([n*n for n in data])
+        squares = sum([n * n for n in data])
         return math.sqrt(squares / data.__len__())
+
+    def fft(self, data=None, trimBy=10, logScale=False, divBy=100):
+        if data is None:
+            data = self.audio.flatten()
+        left, right = np.split(np.abs(np.fft.fft(data)), 2)
+        ys = np.add(left, right[::-1])
+        if logScale:
+            ys = np.multiply(20, np.log10(ys))
+        xs = np.arange(CHUNK / 2, dtype=float)
+        if trimBy:
+            i = int((CHUNK / 2) / trimBy)
+            ys = ys[:i]
+            xs = xs[:i] * RATE / CHUNK
+        if divBy:
+            ys = ys / float(divBy)
+        return xs, ys
+
+
 if __name__ == '__main__':
 
-    pass
-'''
-    r = Recorder()
+    recorder = Recorder()
 
     import matplotlib.pyplot as pl
-    print ()
-
+    # print ()
+    data = recorder.read()
     # decibles 20 * log 10 ( rms )
+    fft_data = recorder.fft(data)
 
-    pl.plot(data)
+    bam = np.fft.rfft(data)
+    print (bam)
+
+    # print (data)
+    # print (fft_data)
+    # pl.plot(fft_data)
+    pl.plot(bam)
     pl.show()
 
 
-
+'''
 frames = []
 
 for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
