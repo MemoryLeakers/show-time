@@ -48,11 +48,13 @@ if __name__ == '__main__':
     def sendValue():
         recorder = Recorder()
         data = recorder.read()
-        # vol = recorder.rms(data) * 50
+        vol = recorder.rms(data) * 50
         bam = np.fft.rfft(data)
+        result_dict = {"volume": vol, "signals": bam}
         for client in clients:
             # client.write_message(vol.__str__())
-            client.write_message(bam.__str__())
+            # client.write_message(bam.__str__())
             # client.write_message(value.__str__())
+            client.write_message(result_dict)
     while 1:
         sendValue()
