@@ -3,6 +3,7 @@ import json
 import threading
 import os
 import tornado
+import numpy as np
 
 from recorder import Recorder
 
@@ -47,9 +48,11 @@ if __name__ == '__main__':
     def sendValue():
         recorder = Recorder()
         data = recorder.read()
-        vol = recorder.rms(data) * 50
+        # vol = recorder.rms(data) * 50
+        bam = np.fft.rfft(data)
         for client in clients:
-            client.write_message(vol.__str__())
+            # client.write_message(vol.__str__())
+            client.write_message(bam.__str__())
             # client.write_message(value.__str__())
     while 1:
         sendValue()

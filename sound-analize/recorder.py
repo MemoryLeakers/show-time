@@ -57,22 +57,24 @@ class Recorder():
 
 if __name__ == '__main__':
 
-    recorder = Recorder()
+    pass
 
-    import matplotlib.pyplot as pl
-    # print ()
-    data = recorder.read()
-    # decibles 20 * log 10 ( rms )
-    fft_data = recorder.fft(data)
+    # recorder = Recorder()
 
-    bam = np.fft.rfft(data)
-    print (bam)
+    # import matplotlib.pyplot as pl
+    # # print ()
+    # data = recorder.read()
+    # # decibles 20 * log 10 ( rms )
+    # fft_data = recorder.fft(data)
 
-    # print (data)
-    # print (fft_data)
-    # pl.plot(fft_data)
-    pl.plot(bam)
-    pl.show()
+    # bam = np.fft.rfft(data)
+    # print (bam)
+
+    # # print (data)
+    # # print (fft_data)
+    # # pl.plot(fft_data)
+    # pl.plot(bam)
+    # pl.show()
 
 
 '''
