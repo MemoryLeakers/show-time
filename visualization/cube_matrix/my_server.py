@@ -4,31 +4,17 @@ import threading
 import os
 import tornado
 import numpy as np
-import socket
-
 
 from recorder import Recorder, CHUNK
 
 clients = []
 
 
-
-def get_ip():
-    try:
-        ip = ([(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])
-    except:
-        ip = '127.0.0.1'
-    return ip
-
 class IndexHandler(web.RequestHandler):
 
     def get(self):
-        self.render("index.html", ip=get_ip())
+        self.render("index.html")
 
-class TunerHandler(web.RequestHandler):
-
-    def get(self):
-        self.render("tuner.html", ip=get_ip())
 
 class SocketHandler(websocket.WebSocketHandler):
 
@@ -49,7 +35,6 @@ js_path = os.path.join(PATH, 'js')
 print(css_path)
 app = web.Application([
     (r'/', IndexHandler),
-    (r'/tuner', TunerHandler),
     (r'/ws', SocketHandler),
     (r'/css/(.*)', tornado.web.StaticFileHandler, {'path': css_path}),
     (r'/js/(.*)', tornado.web.StaticFileHandler, {'path': js_path}),
@@ -60,22 +45,24 @@ if __name__ == '__main__':
     t = threading.Thread(target=ioloop.IOLoop.instance().start)
     t.start()
 
+
     def sendValue():
         rec = Recorder()
         data = rec.read()
         vol = rec.rms(data) * 50
-        # bam = np.fft.rfft(data)
+        bam = np.fft.fft(data)
+
+
+
+
         bam = rec.prepare_fft(data, CHUNK)
-        note = rec.prepare_note(bam)
 
-
-
-
-        result_dict = {"volume": vol, "frequency": bam, "note": note, "signal": rec.prepare_signal(data)}
+        result_dict = {"volume": vol, "frequency": bam}
         for client in clients:
             # client.write_message(vol.__str__())
             # client.write_message(bam.__str__())
             # client.write_message(value.__str__())
             client.write_message(tornado.escape.json_encode(result_dict))
+            #client.write_message(bam)
     while 1:
         sendValue()
