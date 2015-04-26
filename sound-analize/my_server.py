@@ -1,11 +1,11 @@
-from tornado import websocket, web, ioloop
+from tornado import websocket, web, ioloop, escape
 import json
 import threading
 import os
 import tornado
 import numpy as np
 
-from recorder import Recorder
+from recorder import Recorder, CHUNK
 
 clients = []
 
@@ -45,14 +45,19 @@ if __name__ == '__main__':
     t = threading.Thread(target=ioloop.IOLoop.instance().start)
     t.start()
 
+
     def sendValue():
-        recorder = Recorder()
-        data = recorder.read()
-        # vol = recorder.rms(data) * 50
-        bam = np.fft.rfft(data)
+        rec = Recorder()
+        data = rec.read()
+        vol = rec.rms(data) * 50
+        # bam = np.fft.rfft(data)
+        bam = rec.prepare_fft(data, CHUNK)
+
+        result_dict = {"volume": vol, "frequency": bam}
         for client in clients:
             # client.write_message(vol.__str__())
-            client.write_message(bam.__str__())
+            # client.write_message(bam.__str__())
             # client.write_message(value.__str__())
+            client.write_message(tornado.escape.json_encode(result_dict))
     while 1:
         sendValue()
