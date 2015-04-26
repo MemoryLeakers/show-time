@@ -17,12 +17,12 @@ function init() {
     animateCamera();
 
     function init() {
-        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+        camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000);
 
         // Set initial positions
-        camera.position.x = 10;
-        camera.position.z = 170;
-        camera.position.y = 15;
+        camera.position.x = 1;
+        camera.position.z = 1;
+        camera.position.y = 150;
 
         loader = new THREE.BinaryLoader(true);
 
@@ -96,9 +96,9 @@ function init() {
             console.log('opened');
         };
         ws.onmessage = function(ev){
-            console.log('value set to: ', ev.data);
-            animateMusic(ev.data);
-            soundVolume = ev.data;
+            //console.log('value set to: ', ev.data);
+            soundVolume = chance.integer({min: 0, max: 10});
+            animateMusic(soundVolume);
         };
         ws.onclose = function(ev){
             console.log('closed');
@@ -141,9 +141,21 @@ function init() {
 
         var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
         var cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
-        var cube, cubes, cols;
+        var cube, cubes, cols, hue;
 
-        for(cols = 0; cols <= 10; cols += 1) {
+        for(cols = 0; cols <= columnHeight; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+            console.log(columnColor);
+
             for (cubes = 0; cubes <= columnHeight; cubes += 1) {
                 coords.y = (cubes * 10);
                 coords.x = (cols * 10);
@@ -162,6 +174,16 @@ function init() {
         }
 
         for(cols = 0; cols <= 10; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+
             for (cubes = 0; cubes <= columnHeight; cubes += 1) {
                 coords.y = (cubes * 10);
                 coords.x = (cols * -10);
@@ -179,6 +201,91 @@ function init() {
             }
         }
 
+        for(cols = 0; cols <= 10; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.z = (cubes * -10);
+                coords.y = (cubes * 10);
+
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
+
+                // position the cubes
+                cube.position.x = 0;
+                cube.position.y = coords.y;
+                cube.position.z = coords.z + coords.y;
+
+                // add the cubes to the scene
+                scene.add(cube);
+            }
+        }
+
+        for(cols = 0; cols <= 10; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.x = 0;
+                coords.y = (cubes * 10);
+                coords.z = (cols * -10);
+
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
+
+                // position the cubes
+                cube.position.x = coords.x;
+                cube.position.y = coords.y + coords.z;
+                cube.position.z = coords.z;
+
+                // add the cubes to the scene
+                scene.add(cube);
+            }
+        }
+
+        for(cols = 0; cols <= 10; cols += 1) {
+            hue = Math.floor(cols/10 * 30) * 12;
+
+            columnColor = $.Color({
+                hue: hue,
+                saturation: 0.9,
+                lightness: 0.6,
+                alpha: 1
+            }).toHexString();
+            cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.x = 0;
+                coords.y = (cubes * 10);
+                coords.z = (cols * 10);
+
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
+
+                // position the cubes
+                cube.position.x = coords.x;
+                cube.position.y = coords.y - coords.z;
+                cube.position.z = coords.z;
+
+                // add the cubes to the scene
+                scene.add(cube);
+            }
+        }
 
         render();
     }
