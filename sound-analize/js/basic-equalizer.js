@@ -1,7 +1,7 @@
 function init() {
     'use strict';
 
-    var container, stats, plane, scene;
+    var container, stats, plane, scene, particle, sphere;
     var camera, cameraControls, controls, renderer;
     var cross, yellowLight, greyLight, object, loader;
 
@@ -11,21 +11,18 @@ function init() {
     var soundVolume = 0;
 
     // Coordinates for letters
-    var cubesCoords = [
-        // H
-        [-180, 5, 0], [-180, 15, 0], [-180, 25, 0], [-180, 35, 0], [-180, 45, 0]
-        ];
+    var cubesCoords = [[-180, 5, 0], [-180, 15, 0], [-180, 25, 0], [-180, 35, 0], [-180, 45, 0]];
 
     init();
     animateCamera();
 
     function init() {
-        camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000);
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
 
         // Set initial positions
         camera.position.x = 10;
         camera.position.z = 170;
-        camera.position.y = 20;
+        camera.position.y = 15;
 
         loader = new THREE.BinaryLoader(true);
 
@@ -63,13 +60,13 @@ function init() {
         scene.add(plane);
 
         // white spotlight shining from the side, casting shadow
-        var spotLight = new THREE.SpotLight( 0xffffff, 2);
+        var spotLight = new THREE.SpotLight(0xffffff, 2);
         spotLight.position.set(130, 100, 100);
 
         spotLight.castShadow = true;
         spotLight.shadowDarkness = 1;
 
-        scene.add( spotLight );
+        scene.add(spotLight);
 
         // Additional lights
         var light = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
@@ -131,39 +128,57 @@ function init() {
         //remove everything
         while (l--) {
             if(Object.keys(scene.children[l]).indexOf('geometry') > -1) {
-                console.log(scene.children[l].geometry);
                 if(scene.children[l].geometry.type === 'BoxGeometry'){
                     scene.remove(scene.children[l]);
                 }
             }
         }
 
-        var columnHight = soundVolume, cubes;
+        var columnHeight = soundVolume;
         var columnColor = chance.color();
-        
-        for(cubes = 0; cubes <= columnHight; cubes +=1){
-            var coords = {
-                x: 0,
-                z: 0
-            };
 
-            coords.y = (coords.y || 0) + cubes * 10;
+        var coords  = {x: 0, z: 0, y: 0};
 
-            var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
-            var cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+        var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+        var cubeMaterial = new THREE.MeshLambertMaterial({color: columnColor});
+        var cube, cubes, cols;
 
-            var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-            cube.castShadow = true;
+        for(cols = 0; cols <= 10; cols += 1) {
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.y = (cubes * 10);
+                coords.x = (cols * 10);
 
-            // position the cubes
-            cube.position.x = coords.x;
-            cube.position.y = coords.y;
-            cube.position.z = coords.z;
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
 
-            // add the cubes to the scene
-            scene.add(cube);
+                // position the cubes
+                cube.position.x = coords.x;
+                cube.position.y = coords.y - coords.x;
+                cube.position.z = coords.z;
 
+                // add the cubes to the scene
+                scene.add(cube);
+            }
         }
+
+        for(cols = 0; cols <= 10; cols += 1) {
+            for (cubes = 0; cubes <= columnHeight; cubes += 1) {
+                coords.y = (cubes * 10);
+                coords.x = (cols * -10);
+
+                cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.castShadow = true;
+
+                // position the cubes
+                cube.position.x = coords.x;
+                cube.position.y = coords.y + coords.x;
+                cube.position.z = coords.z;
+
+                // add the cubes to the scene
+                scene.add(cube);
+            }
+        }
+
 
         render();
     }
