@@ -45,15 +45,15 @@ if __name__ == '__main__':
     t = threading.Thread(target=ioloop.IOLoop.instance().start)
     t.start()
 
-
     def sendValue():
         rec = Recorder()
         data = rec.read()
         vol = rec.rms(data) * 50
         # bam = np.fft.rfft(data)
         bam = rec.prepare_fft(data, CHUNK)
+        note = rec.prepare_note(bam)
 
-        result_dict = {"volume": vol, "frequency": bam}
+        result_dict = {"volume": vol, "frequency": bam, "note": note}
         for client in clients:
             # client.write_message(vol.__str__())
             # client.write_message(bam.__str__())
