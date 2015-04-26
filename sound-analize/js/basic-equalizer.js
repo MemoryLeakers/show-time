@@ -90,7 +90,7 @@ function init() {
 
         window.addEventListener('resize', onWindowResize, false);
 
-        var ws = new WebSocket('ws://localhost:8888/ws');
+        var ws = new WebSocket('ws://' + IPAddress + ':8888/ws');
 
         ws.onopen = function(){
             console.log('opened');
