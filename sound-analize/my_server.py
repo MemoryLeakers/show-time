@@ -16,13 +16,15 @@ class IndexHandler(web.RequestHandler):
 
     def get(self):
         ip = ([(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])
-
+        #kwargs = {'ip': ip}
         self.render("index.html", ip=ip)
 
 class TunerHandler(web.RequestHandler):
 
     def get(self):
-        self.render("tuner.html")
+        ip = ([(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])
+        kwargs = {'ip': ip}
+        self.render("tuner.html", ip=ip)
 
 class SocketHandler(websocket.WebSocketHandler):
 
