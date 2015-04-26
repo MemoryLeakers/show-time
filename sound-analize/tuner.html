@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Show Time</title>
-  <style>
-    body {
-      /* set margin to 0 and overflow to hidden, to
-       use the complete page */
-      margin: 0;
-      overflow: hidden;
-    }
-  </style>
-
-  <script type="text/javascript" src="js/libs/three.js"></script>
-  <script type="text/javascript" src="js/libs/chance.js"></script>
-
-  <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-  <script src="js/libs/jquery.color.js"></script>
+  <title>tornado WebSocket example</title>
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 </head>
 <body>
-  <!-- Div which will hold the Output -->
-  <div id="WebGL-output"></div>
+  <input type='range' id='slider'></input>
+  <input type='text' id='note'></input>
+  <script>
+    var ws = new WebSocket('ws://{{ ip }}:8888/ws');
 
-  <!-- Javascript code wit additional libs and controls-->
-  <script type="text/javascript" src="js/controls/TrackballControls.js"></script>
-  <script type="text/javascript" src="js/controls/BinaryLoader.js"></script>
-  <script type="text/javascript" src="js/libs/stats.min.js"></script>
-  <script type="text/javascript" src="js/renderers/Projector.js"></script>
-  <script type="text/javascript" src="js/renderers/CanvasRenderer.js"></script>
+    ws.onopen = function(){
+        console.log('opened')
+    };
+    ws.onmessage = function(ev){
 
-  <!-- Javascript code that runs our custom forms -->
-  <script type="text/javascript" src="js/theme-scene.js"></script>
-  <!--<script type="text/javascript" src="js/basic-equalizer.js"></script>-->
 
+
+     ev.data = JSON.parse(ev.data)
+
+        ev.data.frequency=0
+      console.log('value set to: ', ev.data)
+      slider.value = ev.data.volume
+      note.value = ev.data.note
+    };
+    ws.onclose = function(ev){
+      console.log('closed')
+    };
+    ws.onerror = function(ev){
+      console.log('error: ', ev)
+    };
+  </script>
 </body>
 </html>

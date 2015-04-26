@@ -4,6 +4,8 @@ import threading
 import os
 import tornado
 import numpy as np
+import socket
+
 
 from recorder import Recorder, CHUNK
 
@@ -13,8 +15,14 @@ clients = []
 class IndexHandler(web.RequestHandler):
 
     def get(self):
-        self.render("index.html")
+        ip = ([(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])
 
+        self.render("index.html", ip=ip)
+
+class TunerHandler(web.RequestHandler):
+
+    def get(self):
+        self.render("tuner.html")
 
 class SocketHandler(websocket.WebSocketHandler):
 
@@ -35,6 +43,7 @@ js_path = os.path.join(PATH, 'js')
 print(css_path)
 app = web.Application([
     (r'/', IndexHandler),
+    (r'/tuner', TunerHandler),
     (r'/ws', SocketHandler),
     (r'/css/(.*)', tornado.web.StaticFileHandler, {'path': css_path}),
     (r'/js/(.*)', tornado.web.StaticFileHandler, {'path': js_path}),
