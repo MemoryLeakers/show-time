@@ -8,7 +8,7 @@ function init() {
     var clock = new THREE.Clock();
     var chance = new Chance(new Date());
 
-    var soundVolume = 0;
+    var soundVolume = 0, frequency = [];
 
     // Coordinates for letters
     var cubesCoords = [
@@ -112,9 +112,11 @@ function init() {
             console.log('opened');
         };
         ws.onmessage = function(ev){
-            console.log('value set to: ', ev.data);
-            animateMusic(ev.data);
-            soundVolume = ev.data;
+            soundVolume = JSON.parse(ev.data).volume;
+            frequency = JSON.parse(ev.data).frequency;
+
+            console.log('socket data:', ev.data);
+            animateMusic(soundVolume, frequency);
         };
         ws.onclose = function(ev){
             console.log('closed');
@@ -139,17 +141,18 @@ function init() {
         cameraControls.update();
     }
 
-    function animateMusic(soundVolume){
+    function animateMusic(soundVolume, frequency){
         var l = scene.children.length;
         //remove everything
         while (l--) {
-            console.log(scene.children[l]);
-            if(scene.children[l].type === 'Mesh') {
-                scene.remove(scene.children[l]);
+            if(Object.keys(scene.children[l]).indexOf('geometry') > -1) {
+                if(scene.children[l].geometry.type === 'BoxGeometry'){
+                    scene.remove(scene.children[l]);
+                }
             }
         }
 
-        cubesCoords.forEach(function (coords) {
+        cubesCoords.forEach(function (coords, i) {
             // create a cube
             var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
             var cubeMaterial;
@@ -164,9 +167,9 @@ function init() {
             cube.castShadow = true;
 
             // position the cubes
-            cube.position.x = coords[0] + 0;
-            cube.position.y = coords[1] + 0;
-            cube.position.z = coords[2] + Math.round(soundVolume) * 10;
+            cube.position.x = coords[0] + frequency[i] * 100;
+            cube.position.y = coords[1] + frequency[i] * 100;
+            cube.position.z = coords[2] + Math.round(soundVolume) * 2;
 
             // add the cubes to the scene
             scene.add(cube);

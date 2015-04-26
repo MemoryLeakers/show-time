@@ -8,7 +8,7 @@ function init() {
     var clock = new THREE.Clock();
     var chance = new Chance(new Date());
 
-    var soundVolume = 0;
+    var soundVolume = 0, frequency = 0;
 
     // Coordinates for letters
     var cubesCoords = [[-180, 5, 0], [-180, 15, 0], [-180, 25, 0], [-180, 35, 0], [-180, 45, 0]];
@@ -96,9 +96,11 @@ function init() {
             console.log('opened');
         };
         ws.onmessage = function(ev){
-            //console.log('value set to: ', ev.data);
-            soundVolume = chance.integer({min: 0, max: 10});
-            animateMusic(soundVolume);
+            soundVolume = JSON.parse(ev.data).volume;
+            frequency = JSON.parse(ev.data).frequency;
+
+            console.log('socket data:', ev.data);
+            animateMusic(soundVolume, frequency);
         };
         ws.onclose = function(ev){
             console.log('closed');
@@ -123,7 +125,7 @@ function init() {
         cameraControls.update();
     }
 
-    function animateMusic(soundVolume){
+    function animateMusic(soundVolume, frequency){
         var l = scene.children.length;
         //remove everything
         while (l--) {
@@ -134,7 +136,7 @@ function init() {
             }
         }
 
-        var columnHeight = soundVolume;
+        var columnHeight = soundVolume / 5;
         var columnColor = chance.color();
 
         var coords  = {x: 0, z: 0, y: 0};
