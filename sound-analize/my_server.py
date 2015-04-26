@@ -49,7 +49,8 @@ if __name__ == '__main__':
         recorder = Recorder()
         data = recorder.read()
         vol = recorder.rms(data) * 50
-        bam = np.fft.rfft(data)
+        # bam = np.fft.rfft(data)
+        bam = np.fft.fft(data)
         result_dict = {"volume": vol, "signals": bam}
         for client in clients:
             # client.write_message(vol.__str__())
