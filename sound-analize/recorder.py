@@ -48,10 +48,11 @@ class Recorder():
         '''
         Dark magic formulae for finding note from the frequency
         '''
-        F = (data[np.argmax(data)] / CHUNK) * RATE
-        print (F)
+        return 0
+	#F = (data[np.argmax(data)] / CHUNK) * RATE
+        #print (F)
         # F = data[F]
-        return 12 * math.log(F / 440, 2) + 49
+        #return 12 * math.log(F / 440, 2) + 49
 
     def fft(self, data=None, trimBy=10, logScale=False, divBy=100):
         if data is None:
