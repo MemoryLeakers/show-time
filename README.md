@@ -1,11 +1,12 @@
 # show-time
 Analyze and visualize sounds in 3D via RaspberryPi in real-time.
 
+![Screenshot HackFMI Equalizer](http://i.imgur.com/UFeGxcN.png)
+
 #### Hardware:
-- RaspberryPi (B+)
 - Microphone
 
 #### Languages & tools:
-- Python (web-server, sound analize)
+- Python (web-server, sound analyze)
 - JavaScript (3D Graphics)
   - three.js
