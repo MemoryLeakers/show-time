@@ -7,6 +7,6 @@ Analyze and visualize sounds in 3D via RaspberryPi in real-time.
 - Microphone
 
 #### Languages & tools:
-- Python (web-server, sound analize)
+- Python (web-server, sound analyze)
 - JavaScript (3D Graphics)
   - three.js
